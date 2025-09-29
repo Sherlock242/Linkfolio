@@ -45,7 +45,7 @@ export default function InquiryViewer() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load inquiries.",
+        description: "Failed to load inquiries. Please make sure the 'inquiries' table is set up correctly in Supabase.",
       });
     } else {
       setInquiries(data);
