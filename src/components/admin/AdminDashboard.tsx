@@ -33,9 +33,9 @@ export default function AdminDashboard() {
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-headline font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={logout} asChild>
+            <Button variant="ghost" size="icon" onClick={logout} asChild>
               <Link href="/">
-                <LogOut className="mr-2 h-4 w-4" /> Logout
+                <LogOut className="h-5 w-5" />
               </Link>
             </Button>
           </div>
