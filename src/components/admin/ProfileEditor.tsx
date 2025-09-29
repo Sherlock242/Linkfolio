@@ -1,5 +1,6 @@
 "use client";
 
+import { useState }from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import { Edit } from "lucide-react";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,6 +29,8 @@ interface ProfileEditorProps {
 
 export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
   const { toast } = useToast();
+  const [isEditingImage, setIsEditingImage] = useState(false);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -42,6 +47,7 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
       description: "Your profile information has been saved.",
     });
     form.reset(values);
+    setIsEditingImage(false);
   }
 
   return (
@@ -53,6 +59,47 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <FormLabel>Profile Picture</FormLabel>
+              <div className="relative w-32 h-32 group">
+                <Image
+                  src={form.watch("profilePictureUrl") || "/placeholder.svg"}
+                  alt="Profile Picture"
+                  width={128}
+                  height={128}
+                  className="rounded-full object-cover w-32 h-32 border-4 border-card"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="absolute bottom-1 right-1 rounded-full group-hover:opacity-100 opacity-0 transition-opacity"
+                  onClick={() => setIsEditingImage(true)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {isEditingImage && (
+              <FormField
+                control={form.control}
+                name="profilePictureUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profile Picture URL</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input placeholder="https://example.com/image.png" {...field} />
+                        <Button type="button" variant="secondary" onClick={() => setIsEditingImage(false)}>Cancel</Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="name"
@@ -79,19 +126,7 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="profilePictureUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profile Picture URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/image.png" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
             <Button type="submit" disabled={!form.formState.isDirty}>Save Changes</Button>
           </form>
         </Form>
