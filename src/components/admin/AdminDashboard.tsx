@@ -7,8 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileEditor from "./ProfileEditor";
 import SocialLinksEditor from "./SocialLinksEditor";
 import CustomLinksEditor from "./CustomLinksEditor";
-import { LogOut, Eye } from "lucide-react";
-import Link from "next/link";
+import { LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminDashboard() {
@@ -31,11 +30,6 @@ export default function AdminDashboard() {
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-headline font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/" target="_blank" rel="noopener noreferrer">
-                <Eye className="mr-2 h-4 w-4" /> Preview
-              </Link>
-            </Button>
             <Button variant="ghost" onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
