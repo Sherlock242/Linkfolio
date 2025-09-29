@@ -9,6 +9,13 @@ const PROFILE_ID = '1'; // Assuming a single profile for this application
 
 const profilePlaceholder = PlaceHolderImages.find(p => p.id === 'profile-picture');
 
+const defaultTheme = {
+  background: { h: 228, s: 67, l: 97 },
+  primary: { h: 231, s: 48, l: 48 },
+  accent: { h: 187, s: 100, l: 42 },
+  font: 'inter' as const,
+};
+
 const initialData: ProfileData = {
   profilePictureUrl: profilePlaceholder?.imageUrl || "https://picsum.photos/seed/linkfolio-profile/256/256",
   name: 'Alex Doe',
@@ -22,12 +29,7 @@ const initialData: ProfileData = {
     { id: '1', title: 'My Portfolio', url: '#', imageUrl: 'https://picsum.photos/seed/1/500/300' },
     { id: '2', title: 'Latest Blog Post', url: '#', imageUrl: 'https://picsum.photos/seed/2/500/300' },
   ],
-  theme: {
-    background: { h: 228, s: 67, l: 97 },
-    primary: { h: 231, s: 48, l: 48 },
-    accent: { h: 187, s: 100, l: 42 },
-    font: 'inter',
-  }
+  theme: defaultTheme,
 };
 
 
@@ -42,6 +44,14 @@ export function useLinkFolioStore() {
         .select('*')
         .eq('id', PROFILE_ID)
         .single();
+        
+      const processProfileData = (profileData: any): ProfileData => {
+        return {
+          ...initialData,
+          ...profileData,
+          theme: profileData.theme || defaultTheme,
+        };
+      };
 
       if (error && error.code === 'PGRST116') { // PostgREST error for zero rows returned
         console.warn('No profile found in DB, creating one with initial data.');
@@ -56,13 +66,13 @@ export function useLinkFolioStore() {
           console.error("Failed to create initial profile in Supabase", insertError);
           setData(initialData); // Fallback to local initial data
         } else {
-          setData(newProfile);
+          setData(processProfileData(newProfile));
         }
       } else if (error) {
         console.error("Failed to load data from Supabase", error);
         setData(initialData); // Fallback to local initial data on other errors
       } else {
-        setData(profile);
+        setData(processProfileData(profile));
       }
       setIsInitialized(true);
     }
