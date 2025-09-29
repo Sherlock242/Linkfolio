@@ -26,6 +26,13 @@ interface ThemeEditorProps {
   onUpdate: (newData: Partial<ProfileData>) => void;
 }
 
+const defaultTheme: ThemeSettings = {
+  background: { h: 228, s: 67, l: 97 },
+  primary: { h: 231, s: 48, l: 48 },
+  accent: { h: 187, s: 100, l: 42 },
+  font: 'inter' as const,
+};
+
 const HSLSlider = ({ value, onChange }: { value: { h: number, s: number, l: number }, onChange: (key: 'h'|'s'|'l', value: number) => void }) => (
   <div className="space-y-4">
     <div>
@@ -59,6 +66,14 @@ export default function ThemeEditor({ data, onUpdate }: ThemeEditorProps) {
       description: "Your new theme has been saved and applied.",
     });
     form.reset(values);
+  }
+
+  const handleResetTheme = () => {
+    form.reset(defaultTheme);
+    toast({
+        title: "Theme Reset",
+        description: "Save changes to apply the default theme.",
+    });
   }
 
   const currentTheme = form.watch();
@@ -151,8 +166,10 @@ export default function ThemeEditor({ data, onUpdate }: ThemeEditorProps) {
                     />
                  </div>
             </div>
-
-            <Button type="submit" disabled={!form.formState.isDirty}>Save Changes</Button>
+            <div className="flex gap-2">
+                <Button type="submit" disabled={!form.formState.isDirty}>Save Changes</Button>
+                <Button type="button" variant="outline" onClick={handleResetTheme}>Reset to Default</Button>
+            </div>
           </form>
         </Form>
       </CardContent>
