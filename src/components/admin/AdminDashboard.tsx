@@ -32,7 +32,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-headline font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={logout} asChild>
-              <Link href="/login">
+              <Link href="/">
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </Link>
             </Button>
