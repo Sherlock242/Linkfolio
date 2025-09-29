@@ -1,6 +1,7 @@
 "use client";
 
-import { useForm, zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { ProfileData } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
       title: "Profile Updated",
       description: "Your profile information has been saved.",
     });
+    form.reset(values);
   }
 
   return (
