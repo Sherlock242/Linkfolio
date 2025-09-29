@@ -136,8 +136,8 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
             ) : (
               <div key={link.id} className="flex items-center gap-4 p-2 rounded-lg border">
                 <Image src={link.imageUrl || 'https://picsum.photos/seed/placeholder/64/64'} alt={link.title} width={48} height={48} className="rounded-md object-cover aspect-square" />
-                <div className="flex-grow">
-                  <p className="font-medium">{link.title}</p>
+                <div className="flex-grow min-w-0">
+                  <p className="font-medium truncate">{link.title}</p>
                   <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                 </div>
                 <div className="flex flex-col">
