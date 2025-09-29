@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { Edit } from "lucide-react";
+import { Edit, Upload } from "lucide-react";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   bio: z.string().max(200, "Bio can be up to 200 characters"),
-  profilePictureUrl: z.string().url("Must be a valid URL"),
+  profilePictureUrl: z.string().url("Must be a valid URL or Data URL"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -30,6 +30,8 @@ interface ProfileEditorProps {
 export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
   const { toast } = useToast();
   const [isEditingImage, setIsEditingImage] = useState(false);
+  const hiddenFileInput = React.useRef<HTMLInputElement>(null);
+
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -39,6 +41,28 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
       profilePictureUrl: data.profilePictureUrl,
     },
   });
+  
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast({ variant: 'destructive', title: "Error", description: "Image size should not exceed 2MB." });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        form.setValue('profilePictureUrl', imageUrl, { shouldDirty: true });
+        setIsEditingImage(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClickUpload = () => {
+    hiddenFileInput.current?.click();
+  };
+
 
   function onSubmit(values: ProfileFormValues) {
     onUpdate(values);
@@ -82,22 +106,23 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
             </div>
 
             {isEditingImage && (
-              <FormField
-                control={form.control}
-                name="profilePictureUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profile Picture URL</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input placeholder="https://example.com/image.png" {...field} />
-                        <Button type="button" variant="secondary" onClick={() => setIsEditingImage(false)}>Cancel</Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="p-4 rounded-lg border space-y-4">
+                  <p className="text-sm font-medium">Update Profile Picture</p>
+                  <div className="flex gap-2">
+                      <Button type="button" onClick={handleClickUpload}>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload Image
+                      </Button>
+                      <Input
+                          type="file"
+                          ref={hiddenFileInput}
+                          onChange={handleImageUpload}
+                          accept="image/*"
+                          className="hidden"
+                      />
+                      <Button type="button" variant="ghost" onClick={() => setIsEditingImage(false)}>Cancel</Button>
+                  </div>
+              </div>
             )}
 
             <FormField
