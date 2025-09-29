@@ -110,16 +110,16 @@ export default function InquiryViewer() {
           <div className="space-y-4">
             {inquiries.map((inquiry) => (
               <div key={inquiry.id} className="border p-4 rounded-lg">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <p className="font-semibold">{inquiry.name} <span className="font-normal text-muted-foreground">&lt;{inquiry.email}&gt;</span></p>
-                        <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
+                    <div className="flex-grow">
+                        <p className="font-semibold">{inquiry.name} <span className="font-normal text-muted-foreground break-all">&lt;{inquiry.email}&gt;</span></p>
+                        <p className="text-sm text-muted-foreground mt-1">
                             {format(new Date(inquiry.created_at), "PPP p")}
                         </p>
                     </div>
                      <AlertDialog>
                       <AlertDialogTrigger asChild>
-                         <Button variant="ghost" size="icon">
+                         <Button variant="ghost" size="icon" className="flex-shrink-0">
                             <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
@@ -139,7 +139,7 @@ export default function InquiryViewer() {
                       </AlertDialogContent>
                     </AlertDialog>
                 </div>
-                 <p className="mt-4 text-sm whitespace-pre-wrap">{inquiry.message}</p>
+                 <p className="mt-4 text-sm whitespace-pre-wrap break-words">{inquiry.message}</p>
               </div>
             ))}
           </div>
@@ -148,3 +148,5 @@ export default function InquiryViewer() {
     </Card>
   );
 }
+
+    

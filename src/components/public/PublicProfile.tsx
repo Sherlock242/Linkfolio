@@ -5,10 +5,9 @@ import { useLinkFolioStore } from "@/hooks/use-linkfolio-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from 'next/image';
 import { SocialIcon } from '@/components/icons';
-import { ArrowUpRight, AtSign, Globe, Menu, Send } from "lucide-react";
+import { ArrowUpRight, AtSign, Globe, Menu } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -16,15 +15,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetFooter,
-  SheetClose,
-} from "@/components/ui/sheet";
+} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase/client";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 function formatUrl(url: string) {
   try {
@@ -35,45 +32,82 @@ function formatUrl(url: string) {
   }
 }
 
-export default function PublicProfile() {
-  const { data, isInitialized } = useLinkFolioStore();
+function ContactForm() {
   const { toast } = useToast();
-  const [formState, setFormState] = useState({ name: '', email: '', message: '' });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormState(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const { data: inquiryData, error } = await supabase
-      .from("inquiries")
-      .insert([
-        { name: formState.name, email: formState.email, message: formState.message },
-      ]);
+
+    const { error } = await supabase
+      .from('inquiries')
+      .insert([{ name, email, message }]);
 
     setIsSubmitting(false);
 
     if (error) {
-      console.error("Error submitting inquiry:", error);
       toast({
         variant: "destructive",
-        title: "Submission Failed",
+        title: "Submission Error",
         description: "There was a problem sending your message. Please try again.",
       });
+      console.error("Supabase insert error:", error);
     } else {
       toast({
         title: "Message Sent!",
         description: "Thanks for reaching out. I'll get back to you soon.",
       });
-      setFormState({ name: '', email: '', message: '' });
-      // Consider closing the sheet upon successful submission
+      setName('');
+      setEmail('');
+      setMessage('');
     }
   };
 
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input 
+        placeholder="Full Name" 
+        value={name} 
+        onChange={(e) => setName(e.target.value)}
+        required 
+        autoFocus={false}
+      />
+      <Input 
+        type="email" 
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required 
+      />
+      <Textarea 
+        placeholder="Your Message" 
+        rows={5}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        required 
+      />
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? 'Sending...' : 'Send Message'}
+      </Button>
+    </form>
+  )
+}
+
+
+export default function PublicProfile() {
+  const { data, isInitialized } = useLinkFolioStore();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const handleSheetOpen = (e: React.MouseEvent) => {
+    // This is needed to prevent the sheet from immediately closing on mobile
+    e.preventDefault();
+    setSheetOpen(true);
+  }
 
   if (!isInitialized || !data) {
     return <PublicProfileSkeleton />;
@@ -83,53 +117,33 @@ export default function PublicProfile() {
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground antialiased selection:bg-primary/20">
-      <header className="fixed top-0 left-0 right-0 z-20 flex justify-end p-4">
-        <Sheet>
+      <header className="fixed top-0 right-0 p-4 z-20">
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-full">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={handleSheetOpen}>
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-full md:w-3/4 lg:w-1/2 p-0">
-            <ScrollArea className="h-full">
-              <div className="p-6">
-                <SheetHeader>
-                  <SheetTitle className="text-2xl font-headline">Apply for a custom website</SheetTitle>
-                  <SheetDescription>
-                    Fill out the form below and I'll get back to you as soon as possible.
-                  </SheetDescription>
-                </SheetHeader>
-                <form onSubmit={handleFormSubmit} className="space-y-6 py-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="John Doe" value={formState.name} onChange={handleFormChange} required autoFocus={false}/>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="john@example.com" value={formState.email} onChange={handleFormChange} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Your Message</Label>
-                    <Textarea id="message" placeholder="Tell me about your project..." value={formState.message} onChange={handleFormChange} required rows={6}/>
-                  </div>
-                   <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      <Send className="mr-2 h-4 w-4" />
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
-                    </Button>
-                </form>
-                <SheetFooter>
-                    <p className="text-xs text-muted-foreground">
-                        You can also reach out via social media.
-                    </p>
-                </SheetFooter>
-              </div>
-            </ScrollArea>
+          <SheetContent 
+            className="w-full"
+            side="right"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <SheetHeader>
+              <SheetTitle>Apply for a custom website</SheetTitle>
+              <SheetDescription>
+                Fill out the form below and I&apos;ll get back to you as soon as possible.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="py-8">
+              <ContactForm />
+            </div>
           </SheetContent>
         </Sheet>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-2xl px-4 py-8 md:px-8 md:py-16">
+      <main className="relative z-10 mx-auto max-w-2xl px-4 py-16 md:px-8 md:py-24">
         <div className="flex flex-col items-center text-center">
           
           <div className="profile-picture-ring mb-6">
@@ -232,3 +246,5 @@ function PublicProfileSkeleton() {
     </div>
   );
 }
+
+    

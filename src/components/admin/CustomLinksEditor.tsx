@@ -140,7 +140,7 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
                   <p className="font-medium truncate">{link.title}</p>
                   <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col sm:flex-row">
                   <Button variant="ghost" size="icon" onClick={() => handleStartEdit(link)}>
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -172,3 +172,5 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
     </Card>
   );
 }
+
+    
