@@ -1,109 +1,112 @@
 "use client";
+
 import { useLinkFolioStore } from "@/hooks/use-linkfolio-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import Link from "next/link";
-import { SocialIcon } from "@/components/icons";
+import { SocialIcon } from "../icons";
 import { ArrowUpRight } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { buttonVariants } from "@/components/ui/button";
 
-export default function PublicProfile() {
+function PublicProfile() {
   const { data, isInitialized } = useLinkFolioStore();
+  const { isAuthenticated } = useAuth();
 
   if (!isInitialized || !data) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 sm:p-6 md:p-8">
-        <div className="w-full max-w-lg mx-auto">
-          <div className="flex flex-col items-center space-y-6">
-            <Skeleton className="h-32 w-32 rounded-full" />
-            <div className="space-y-2 text-center w-full">
-              <Skeleton className="h-8 w-1/2 mx-auto" />
-              <Skeleton className="h-5 w-3/4 mx-auto" />
-            </div>
-            <div className="flex space-x-4">
-              <Skeleton className="h-8 w-8" />
-              <Skeleton className="h-8 w-8" />
-              <Skeleton className="h-8 w-8" />
-            </div>
-            <div className="w-full space-y-4 pt-6">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
-            </div>
-          </div>
+      <div className="w-full max-w-2xl mx-auto p-4 md:p-8">
+        <Skeleton className="h-32 w-32 rounded-full mx-auto" />
+        <Skeleton className="h-8 w-1/2 mx-auto mt-4" />
+        <Skeleton className="h-12 w-3/4 mx-auto mt-2" />
+        <div className="flex justify-center gap-4 mt-4">
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+        </div>
+        <div className="mt-8 space-y-4">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
         </div>
       </div>
     );
   }
 
-  const { name, bio, profilePictureUrl, socialLinks, customLinks } = data;
+  const { name, bio, socialLinks, customLinks, profilePictureUrl } = data;
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-background to-secondary/20 text-foreground font-body">
-      <main className="max-w-4xl mx-auto p-4 sm:p-6 md:p-12">
-        <div className="flex flex-col items-center text-center">
-          <div className="relative mb-6">
-             <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500 to-white rounded-full opacity-75 blur-xl animate-pulse"></div>
-            <Image
-              src={profilePictureUrl}
-              alt={name}
-              width={144}
-              height={144}
-              className="rounded-full object-cover aspect-square relative z-10 border-4 border-background shadow-lg"
-              priority
-            />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">{name}</h1>
-          <p className="mt-3 text-lg md:text-xl max-w-2xl text-muted-foreground">{bio}</p>
-
-          <div className="flex items-center justify-center space-x-6 mt-6">
-            {socialLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-transform duration-300 hover:scale-110"
-              >
-                <SocialIcon platform={link.platform} className="h-7 w-7" />
-                <span className="sr-only">{link.platform}</span>
-              </a>
-            ))}
-          </div>
+    <div className="min-h-screen bg-black text-neutral-200 font-body antialiased">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 text-center flex flex-col items-center">
+        <div className="relative w-32 h-32 md:w-40 md:h-40 mb-6">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/50 to-white/30 animate-pulse-slow"></div>
+          <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-blue-500/50 to-white/30 blur-lg animate-pulse-slow animation-delay-2000"></div>
+          <Image
+            src={profilePictureUrl}
+            alt={name}
+            width={160}
+            height={160}
+            className="rounded-full object-cover w-full h-full border-4 border-black relative z-10"
+            priority
+          />
         </div>
 
-        <div className="mt-12 grid gap-6">
+        <h1 className="text-4xl md:text-5xl font-bold font-headline text-white tracking-tight">
+          {name}
+        </h1>
+        <p className="mt-4 text-base md:text-lg text-neutral-300 max-w-lg">
+          {bio}
+        </p>
+
+        <div className="flex justify-center gap-6 mt-8">
+          {socialLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-white transition-colors duration-300"
+              aria-label={link.platform}
+            >
+              <SocialIcon platform={link.platform} className="h-6 w-6 md:h-7 md:w-7" />
+            </a>
+))}
+        </div>
+
+        <div className="w-full mt-10 space-y-3">
           {customLinks.map((link) => (
             <a
               key={link.id}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-card/50 backdrop-blur-sm border border-border/20 hover:border-primary/50 rounded-2xl p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              className="group bg-neutral-900/50 border border-neutral-800 hover:border-neutral-700 rounded-xl p-3 flex items-center gap-4 text-left transition-all duration-300 transform hover:scale-[1.02] hover:bg-neutral-900"
             >
-              <div className="flex items-center gap-5">
-                <div className="w-24 h-24 relative flex-shrink-0">
-                  <Image
-                    src={link.imageUrl}
-                    alt={link.title}
-                    fill
-                    className="rounded-lg object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-xl font-bold font-headline">{link.title}</h3>
-                  <p className="text-muted-foreground text-sm truncate">{link.url}</p>
-                </div>
-                <ArrowUpRight className="h-6 w-6 text-muted-foreground transition-transform duration-300 group-hover:text-primary group-hover:rotate-45" />
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <Image
+                  src={link.imageUrl || 'https://picsum.photos/seed/placeholder/128/128'}
+                  alt={link.title}
+                  fill
+                  className="rounded-lg object-cover"
+                />
               </div>
+              <div className="flex-grow">
+                <h3 className="font-bold text-white text-base">{link.title}</h3>
+                <p className="text-neutral-400 text-sm truncate">{link.url}</p>
+              </div>
+              <ArrowUpRight className="h-5 w-5 text-neutral-500 group-hover:text-white transition-transform duration-300 group-hover:rotate-45" />
             </a>
           ))}
         </div>
-      </main>
-       <footer className="text-center p-4">
-          <Link href="/login" className="text-xs text-muted-foreground hover:text-primary">
-            Admin
-          </Link>
+        
+        <footer className="mt-12 text-center">
+            <Link href="/login" className={buttonVariants({ variant: "link", className: "text-neutral-600 hover:text-neutral-400" })}>
+              Admin
+            </Link>
         </footer>
+
+      </div>
     </div>
   );
 }
+
+export default PublicProfile;
