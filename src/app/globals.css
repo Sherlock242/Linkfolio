@@ -99,8 +99,6 @@ body {
       from var(--angle),
       #007cf0,
       #00dfd8,
-      #ff007c,
-      #00dfd8,
       #007cf0
     );
     filter: blur(16px);
