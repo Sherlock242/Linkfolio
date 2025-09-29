@@ -43,9 +43,9 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 0 0% 2%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 8%;
+    --card: 0 0% 5%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 2%;
     --popover-foreground: 0 0% 98%;
@@ -53,7 +53,7 @@ body {
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 12%;
+    --muted: 0 0% 10%;
     --muted-foreground: 0 0% 63.9%;
     --accent: 187 100% 42%;
     --accent-foreground: 0 0% 100%;
@@ -84,5 +84,36 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .profile-picture-ring {
+    @apply relative p-1 rounded-full;
+  }
+
+  .profile-picture-ring::before {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      #00c0ff 0deg,
+      #ffffff 120deg,
+      #00c0ff 240deg,
+      #ffffff 360deg
+    );
+    filter: blur(12px);
+    animation: spin 4s linear infinite;
+  }
+  
+  .profile-picture-ring::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-background;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

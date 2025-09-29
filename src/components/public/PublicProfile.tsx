@@ -2,123 +2,132 @@
 
 import { useLinkFolioStore } from "@/hooks/use-linkfolio-store";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
-import { SocialIcon } from "@/components/icons";
-import { ArrowUpRight, Link as LinkIcon } from "lucide-react";
+import Image from 'next/image';
+import { SocialIcon } from '@/components/icons';
+import { ArrowUpRight, AtSign, Globe } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-function ProfileSkeleton() {
-  return (
-    <div className="w-full max-w-2xl mx-auto p-4 md:p-8 flex flex-col items-center gap-8">
-      <Skeleton className="h-32 w-32 rounded-full" />
-      <div className="w-full max-w-md space-y-4">
-        <Skeleton className="h-8 w-1/2 mx-auto" />
-        <Skeleton className="h-6 w-full" />
-        <Skeleton className="h-6 w-3/4 mx-auto" />
-      </div>
-      <div className="flex gap-6">
-        <Skeleton className="h-8 w-8 rounded-full" />
-        <Skeleton className="h-8 w-8 rounded-full" />
-        <Skeleton className="h-8 w-8 rounded-full" />
-      </div>
-      <div className="w-full max-w-md space-y-4 pt-4">
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
-      </div>
-    </div>
-  )
-}
-
-const formatUrl = (url: string) => {
+function formatUrl(url: string) {
   try {
-    const { hostname, pathname } = new URL(url);
-    const path = pathname === '/' ? '' : pathname;
-    // remove www. and trailing slash
-    return `${hostname.replace(/^www\./, '')}${path.length > 15 ? path.substring(0, 15) + '...' : path}`;
+    const urlObject = new URL(url);
+    return urlObject.hostname.replace(/^www\./, '');
   } catch (error) {
     return url;
   }
-};
+}
 
 export default function PublicProfile() {
   const { data, isInitialized } = useLinkFolioStore();
 
   if (!isInitialized || !data) {
-    return (
-      <main className="min-h-screen bg-background text-foreground">
-        <ProfileSkeleton />
-      </main>
-    );
+    return <PublicProfileSkeleton />;
   }
+  
+  const { profilePictureUrl, name, bio, socialLinks, customLinks } = data;
 
   return (
-    <div className="relative min-h-screen w-full bg-background text-foreground font-body overflow-hidden">
-        <div className="absolute top-0 left-0 -translate-x-1/4 -translate-y-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-in fade-in-0 duration-1000" />
-        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 w-[40rem] h-[40rem] bg-accent/10 rounded-full blur-3xl animate-in fade-in-0 duration-1000 delay-500" />
-        
-        <main className="relative z-10 flex flex-col items-center justify-start min-h-screen p-4 sm:p-6 md:p-8 animate-in fade-in-0 slide-in-from-top-10 duration-500">
-            <div className="w-full max-w-2xl mx-auto">
-                <header className="flex flex-col items-center text-center py-12">
-                    <div className="relative mb-6">
-                        <Image
-                            src={data.profilePictureUrl || 'https://picsum.photos/seed/placeholder-profile/256/256'}
-                            alt={data.name}
-                            width={128}
-                            height={128}
-                            className="rounded-full object-cover w-32 h-32 border-4 border-background/50 shadow-lg"
-                        />
-                        <div className="absolute inset-0 rounded-full border-2 border-primary/50 animate-pulse" />
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary bg-[200%_auto] animate-gradient">{data.name}</h1>
-                    <p className="mt-4 max-w-md text-lg text-foreground/80">{data.bio}</p>
-                    <div className="mt-8 flex gap-6">
-                        {data.socialLinks.map(link => (
-                            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-transform duration-300 hover:scale-110">
-                                <SocialIcon platform={link.platform} className="h-7 w-7" />
-                            </a>
-                        ))}
-                    </div>
-                </header>
-
-                <section className="w-full">
-                    <div className="grid grid-cols-1 gap-4">
-                        {data.customLinks.map(link => (
-                            <a
-                                key={link.id}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg p-3 flex items-center gap-4 transition-all duration-300 hover:bg-card/80 hover:border-primary/50 hover:shadow-xl hover:scale-[1.02]"
-                            >
-                                <Image
-                                    src={link.imageUrl || 'https://picsum.photos/seed/placeholder-link/128/128'}
-                                    alt={link.title}
-                                    width={48}
-                                    height={48}
-                                    className="rounded-md object-cover aspect-square"
-                                />
-                                <div className="flex-grow">
-                                    <h3 className="font-semibold text-base text-foreground">{link.title}</h3>
-                                    <p className="text-sm text-foreground/60 flex items-center gap-1">
-                                      <LinkIcon className="w-3 h-3"/>
-                                      {formatUrl(link.url)}
-                                    </p>
-                                </div>
-                                <ArrowUpRight className="h-5 w-5 text-foreground/50 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-primary" />
-                            </a>
-                        ))}
-                    </div>
-                </section>
-                
-                <footer className="text-center py-12 text-foreground/50">
-                    <p>
-                      <Link href="/login" className="hover:text-primary transition-colors">
-                        Admin
-                      </Link>
-                    </p>
-                </footer>
+    <div className="min-h-screen bg-background font-body text-foreground antialiased selection:bg-primary/20">
+      <main className="relative z-10 mx-auto max-w-2xl px-4 py-8 md:px-8 md:py-16">
+        <div className="flex flex-col items-center text-center">
+          
+          <div className="profile-picture-ring mb-6">
+            <div className="relative z-10 w-32 h-32 md:w-40 md:h-40">
+              <Image
+                src={profilePictureUrl}
+                alt={name}
+                fill
+                priority
+                className="rounded-full object-cover border-4 border-background"
+                sizes="(max-width: 768px) 128px, 160px"
+              />
             </div>
-        </main>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl font-bold font-headline text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary animate-in fade-in duration-700">
+            {name}
+          </h1>
+          <p className="mt-4 max-w-md text-base md:text-lg text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200">
+            {bio}
+          </p>
+        </div>
+
+        <div className="mt-8 flex justify-center gap-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300">
+          {socialLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group rounded-full p-3 transition-colors duration-300 hover:bg-primary/10"
+              aria-label={link.platform}
+            >
+              <SocialIcon platform={link.platform} className="h-6 w-6 text-foreground transition-transform duration-300 group-hover:scale-110" />
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-12 space-y-4">
+          {customLinks.map((link, index) => (
+            <a
+              key={link.id}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "group relative flex items-center gap-4 overflow-hidden rounded-lg bg-card p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/10",
+                "animate-in fade-in-0 slide-in-from-bottom-4 duration-500"
+              )}
+              style={{ animationDelay: `${400 + index * 100}ms` }}
+            >
+              <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-md">
+                <Image
+                  src={link.imageUrl || 'https://picsum.photos/seed/placeholder/64/64'}
+                  alt={link.title}
+                  fill
+                  className="object-cover"
+                  sizes="56px"
+                />
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="font-semibold truncate">{link.title}</p>
+                <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                  { link.url.includes('@') ? <AtSign className="h-3 w-3" /> : <Globe className="h-3 w-3" /> }
+                  {formatUrl(link.url)}
+                </p>
+              </div>
+              <ArrowUpRight className="h-5 w-5 flex-shrink-0 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-primary" />
+            </a>
+          ))}
+        </div>
+        <footer className="mt-16 text-center text-sm text-muted-foreground">
+          <Link href="/login" className="hover:text-primary transition-colors">Admin</Link>
+        </footer>
+      </main>
+      <div className="absolute inset-0 z-0 h-full w-full bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px] opacity-50"></div>
+      <div className="absolute top-0 z-0 h-1/2 w-full bg-gradient-to-b from-primary/10 to-transparent"></div>
+    </div>
+  );
+}
+
+
+function PublicProfileSkeleton() {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-16 md:px-8 md:py-24">
+      <div className="flex flex-col items-center text-center">
+        <Skeleton className="h-32 w-32 rounded-full" />
+        <Skeleton className="mt-6 h-12 w-64" />
+        <Skeleton className="mt-4 h-5 w-80" />
+      </div>
+      <div className="mt-8 flex justify-center gap-4">
+        <Skeleton className="h-12 w-12 rounded-full" />
+        <Skeleton className="h-12 w-12 rounded-full" />
+        <Skeleton className="h-12 w-12 rounded-full" />
+      </div>
+      <div className="mt-12 space-y-4">
+        <Skeleton className="h-20 w-full rounded-lg" />
+        <Skeleton className="h-20 w-full rounded-lg" />
+      </div>
     </div>
   );
 }
