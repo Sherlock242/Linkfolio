@@ -14,11 +14,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { Edit, Upload } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   bio: z.string().max(200, "Bio can be up to 200 characters"),
-  profilePictureUrl: z.string().url("Must be a valid URL or Data URL"),
+  profilePictureUrl: z.string().url("Must be a valid URL"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -31,8 +32,8 @@ interface ProfileEditorProps {
 export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
   const { toast } = useToast();
   const [isEditingImage, setIsEditingImage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
-
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -43,20 +44,34 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
     },
   });
   
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         toast({ variant: 'destructive', title: "Error", description: "Image size should not exceed 2MB." });
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string;
-        form.setValue('profilePictureUrl', imageUrl, { shouldDirty: true });
-        setIsEditingImage(false);
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data: uploadData, error } = await supabase.storage
+        .from('linkfolio-images')
+        .upload(`public/${fileName}`, file);
+
+      if (error) {
+        toast({ variant: 'destructive', title: "Upload Error", description: "Failed to upload image to storage." });
+        console.error(error);
+        setIsUploading(false);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('linkfolio-images')
+        .getPublicUrl(uploadData.path);
+      
+      form.setValue('profilePictureUrl', publicUrl, { shouldDirty: true });
+      setIsUploading(false);
+      setIsEditingImage(false);
+      toast({ title: "Image uploaded", description: "Save changes to apply."});
     }
   };
 
@@ -110,9 +125,8 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
               <div className="p-4 rounded-lg border space-y-4">
                   <p className="text-sm font-medium">Update Profile Picture</p>
                   <div className="flex gap-2">
-                      <Button type="button" onClick={handleClickUpload}>
-                          <Upload className="mr-2 h-4 w-4" />
-                          Upload Image
+                      <Button type="button" onClick={handleClickUpload} disabled={isUploading}>
+                          {isUploading ? "Uploading..." : <><Upload className="mr-2 h-4 w-4" /> Upload Image</>}
                       </Button>
                       <Input
                           type="file"
@@ -120,8 +134,9 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
                           onChange={handleImageUpload}
                           accept="image/*"
                           className="hidden"
+                          disabled={isUploading}
                       />
-                      <Button type="button" variant="ghost" onClick={() => setIsEditingImage(false)}>Cancel</Button>
+                      <Button type="button" variant="ghost" onClick={() => setIsEditingImage(false)} disabled={isUploading}>Cancel</Button>
                   </div>
               </div>
             )}
@@ -153,7 +168,7 @@ export default function ProfileEditor({ data, onUpdate }: ProfileEditorProps) {
               )}
             />
             
-            <Button type="submit" disabled={!form.formState.isDirty}>Save Changes</Button>
+            <Button type="submit" disabled={!form.formState.isDirty || isUploading}>Save Changes</Button>
           </form>
         </Form>
       </CardContent>

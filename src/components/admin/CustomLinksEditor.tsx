@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Trash2, Plus, Edit, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase/client";
 
 interface CustomLinksEditorProps {
   data: ProfileData;
@@ -22,24 +23,40 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
   const { toast } = useToast();
   const [newLink, setNewLink] = useState<Omit<CustomLink, 'id'>>({ title: '', url: '', imageUrl: '' });
   const [editingLink, setEditingLink] = useState<EditableLink | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, forEditing: boolean) => {
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, forEditing: boolean) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         toast({ variant: 'destructive', title: "Error", description: "Image size should not exceed 2MB." });
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string;
-        if (forEditing && editingLink) {
-          setEditingLink({ ...editingLink, imageUrl });
-        } else {
-          setNewLink({ ...newLink, imageUrl });
-        }
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data: uploadData, error } = await supabase.storage
+        .from('linkfolio-images')
+        .upload(`public/${fileName}`, file);
+
+      if (error) {
+        toast({ variant: 'destructive', title: "Upload Error", description: "Failed to upload image." });
+        console.error(error);
+        setIsUploading(false);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('linkfolio-images')
+        .getPublicUrl(uploadData.path);
+        
+      if (forEditing && editingLink) {
+        setEditingLink({ ...editingLink, imageUrl: publicUrl });
+      } else {
+        setNewLink({ ...newLink, imageUrl: publicUrl });
+      }
+      setIsUploading(false);
+      toast({ title: "Image uploaded successfully."});
     }
   };
   
@@ -53,7 +70,12 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
         return;
     }
 
-    const linkToAdd: CustomLink = { id: Date.now().toString(), ...newLink };
+    const linkToAdd: CustomLink = { 
+      id: Date.now().toString(), 
+      title: newLink.title,
+      url: newLink.url,
+      imageUrl: newLink.imageUrl || 'https://picsum.photos/seed/placeholder/64/64'
+    };
     const updatedLinks = [...data.customLinks, linkToAdd];
     onUpdate({ customLinks: updatedLinks });
     setNewLink({ title: '', url: '', imageUrl: '' });
@@ -103,12 +125,12 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
                 <Input placeholder="URL" value={editingLink.url} onChange={(e) => handleEditingChange('url', e.target.value)} />
                 <div>
                   <Label htmlFor="edit-image">Link Image</Label>
-                  <Input id="edit-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} className="mt-1" />
+                  <Input id="edit-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} className="mt-1" disabled={isUploading} />
                   {editingLink.imageUrl && <Image src={editingLink.imageUrl} alt="preview" width={64} height={64} className="mt-2 rounded-md object-cover aspect-square" />}
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={handleSaveEdit}><Save className="h-4 w-4 mr-2"/>Save</Button>
-                  <Button size="sm" variant="ghost" onClick={handleCancelEdit}><X className="h-4 w-4 mr-2"/>Cancel</Button>
+                  <Button size="sm" onClick={handleSaveEdit} disabled={isUploading}><Save className="h-4 w-4 mr-2"/>Save</Button>
+                  <Button size="sm" variant="ghost" onClick={handleCancelEdit} disabled={isUploading}><X className="h-4 w-4 mr-2"/>Cancel</Button>
                 </div>
               </div>
             ) : (
@@ -138,16 +160,15 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
             <Input placeholder="URL (e.g., https://...)" value={newLink.url} onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} />
             <div>
                 <Label htmlFor="new-image">Link Image (Optional)</Label>
-                <Input id="new-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, false)} className="mt-1"/>
+                <Input id="new-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, false)} className="mt-1" disabled={isUploading}/>
                 {newLink.imageUrl && <Image src={newLink.imageUrl} alt="preview" width={64} height={64} className="mt-2 rounded-md object-cover aspect-square" />}
             </div>
           </div>
-          <Button onClick={handleAddLink}>
-            <Plus className="h-4 w-4 mr-2" /> Add Link
+          <Button onClick={handleAddLink} disabled={isUploading}>
+            {isUploading ? "Uploading..." : <><Plus className="h-4 w-4 mr-2" /> Add Link</>}
           </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
-
