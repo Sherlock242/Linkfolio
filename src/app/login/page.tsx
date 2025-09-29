@@ -8,7 +8,7 @@ export default function LoginPage() {
         <Card className="shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-headline">LinkFolio Admin</CardTitle>
-            <CardDescription>Enter the password to manage your profile</d>
+            <CardDescription>Enter the password to manage your profile</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
