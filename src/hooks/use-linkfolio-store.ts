@@ -82,18 +82,26 @@ export function useLinkFolioStore() {
 
   const updateData = useCallback(async (newData: Partial<ProfileData>) => {
     if (!data) return;
-    
-    const updatedData = { ...data, ...newData };
-    setData(updatedData);
+
+    let updatePayload = newData;
+
+    if ('theme' in newData && newData.theme === undefined) {
+      const currentData = { ...data, theme: defaultTheme };
+      setData(currentData);
+      updatePayload = { ...newData, theme: null };
+    } else {
+      const updatedData = { ...data, ...newData };
+      setData(updatedData);
+    }
+
 
     const { error } = await supabase
       .from('profiles')
-      .update(newData)
+      .update(updatePayload)
       .eq('id', PROFILE_ID);
 
     if (error) {
       console.error("Failed to save data to Supabase", error);
-      // Here you might want to add error handling, like reverting the state
     }
   }, [data]);
 

@@ -56,7 +56,7 @@ export default function ThemeEditor({ data, onUpdate }: ThemeEditorProps) {
 
   const form = useForm<ThemeFormValues>({
     resolver: zodResolver(themeSchema),
-    defaultValues: data.theme,
+    defaultValues: data.theme || defaultTheme,
   });
 
   function onSubmit(values: ThemeFormValues) {
@@ -69,14 +69,13 @@ export default function ThemeEditor({ data, onUpdate }: ThemeEditorProps) {
   }
 
   const handleResetTheme = () => {
+    onUpdate({ theme: undefined });
     form.reset(defaultTheme);
     toast({
         title: "Theme Reset",
-        description: "Save changes to apply the default theme.",
+        description: "The default theme has been applied and saved.",
     });
   }
-
-  const currentTheme = form.watch();
 
   return (
     <Card>
