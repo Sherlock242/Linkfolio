@@ -1,75 +1,93 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-
-const inquirySchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  description: z.string().min(10, "Please provide a brief description (min. 10 characters)"),
-});
-
-type InquiryFormValues = z.infer<typeof inquirySchema>;
+import { Loader2 } from "lucide-react";
 
 export default function WebsiteInquiryForm() {
   const { toast } = useToast();
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<InquiryFormValues>({
-    resolver: zodResolver(inquirySchema),
-  });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit: SubmitHandler<InquiryFormValues> = (data) => {
-    // In a real application, you would send this data to a server or email service.
-    // For this example, we'll just log it and show a success message.
-    console.log("Form submitted:", data);
-    setIsSubmitted(true);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!name || !email || !description) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Please fill out all fields.",
+      });
+      return;
+    }
+    setIsSubmitting(true);
+
+    // Here you would typically send the data to a server or API endpoint
+    // For now, we'll just simulate a network request and show a toast
+    
+    console.log({ name, email, description });
+
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    setIsSubmitting(false);
+    setName('');
+    setEmail('');
+    setDescription('');
+
     toast({
-      title: "Request Sent!",
-      description: "Thank you for your inquiry. I'll be in touch soon.",
+      title: "Inquiry Sent!",
+      description: "Thank you for your interest. We'll be in touch soon!",
     });
-    reset();
   };
 
-  if (isSubmitted) {
-    return (
-        <div className="text-center p-4 rounded-lg bg-secondary">
-            <h3 className="text-lg font-medium text-secondary-foreground">Thank You!</h3>
-            <p className="text-muted-foreground mt-2">Your request has been sent. I will get back to you shortly.</p>
-        </div>
-    )
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" {...register("name")} />
-        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        <Label htmlFor="name">Full Name</Label>
+        <Input 
+          id="name" 
+          placeholder="Jane Doe" 
+          required 
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" {...register("email")} />
-        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+        <Label htmlFor="email">Email Address</Label>
+        <Input 
+          id="email" 
+          type="email" 
+          placeholder="jane@example.com" 
+          required 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Project Description</Label>
-        <Textarea id="description" {...register("description")} />
-        {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+        <Textarea
+          id="description"
+          placeholder="Tell us about your project..."
+          required
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="min-h-[120px]"
+        />
       </div>
-      <Button type="submit" className="w-full">
-        Send Request
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          "Submit Inquiry"
+        )}
       </Button>
     </form>
   );
