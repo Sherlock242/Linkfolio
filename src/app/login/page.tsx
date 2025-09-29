@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-background p-4">
-       <Button asChild variant="ghost" className="absolute top-4 left-4">
+       <Button asChild variant="ghost" className="absolute top-4 left-4 hover:bg-gray-800 hover:text-gray-100">
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Profile
