@@ -96,14 +96,15 @@ body {
     content: '';
     @apply absolute inset-0 rounded-full;
     background: conic-gradient(
-      from 180deg at 50% 50%,
-      #00c0ff 0deg,
-      #ffffff 120deg,
-      #00c0ff 240deg,
-      #ffffff 360deg
+      from var(--angle),
+      #007cf0,
+      #00dfd8,
+      #ff007c,
+      #00dfd8,
+      #007cf0
     );
-    filter: blur(12px);
-    animation: spin 4s linear infinite;
+    filter: blur(16px);
+    animation: hitech-spin 4s linear infinite;
   }
   
   .profile-picture-ring::after {
@@ -111,9 +112,18 @@ body {
     @apply absolute inset-0 rounded-full bg-background;
   }
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
+  @keyframes hitech-spin {
+    0% {
+      --angle: 0deg;
     }
+    100% {
+      --angle: 360deg;
+    }
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
   }
 }
