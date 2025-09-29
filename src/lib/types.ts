@@ -1,6 +1,6 @@
 export type SocialLink = {
   id: string;
-  platform: 'twitter' | 'linkedin' | 'github' | 'instagram' | 'facebook' | 'website';
+  platform: 'twitter' | 'linkedin' | 'github' | 'instagram' | 'facebook' | 'website' | 'youtube' | 'snapchat' | 'edengram';
   url: string;
 };
 
