@@ -43,7 +43,7 @@ export default function AdminDashboard() {
       <main className="p-4 md:p-8">
         <div className="max-w-5xl mx-auto">
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="w-full justify-start overflow-x-auto">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="socials">Social Links</TabsTrigger>
               <TabsTrigger value="links">Custom Links</TabsTrigger>
