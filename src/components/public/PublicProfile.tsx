@@ -1,12 +1,11 @@
 "use client";
-
 import { useLinkFolioStore } from "@/hooks/use-linkfolio-store";
-import Image from "next/image";
-import Link from "next/link";
-import { SocialIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image';
+import { SocialIcon } from '@/components/icons';
+import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export default function PublicProfile() {
   const { data, isInitialized } = useLinkFolioStore();
@@ -14,19 +13,16 @@ export default function PublicProfile() {
   if (!isInitialized || !data) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-        <div className="w-full max-w-md mx-auto space-y-8">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <Skeleton className="h-32 w-32 rounded-full" />
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
+        <div className="w-full max-w-md mx-auto">
+          <Skeleton className="h-32 w-32 rounded-full mx-auto" />
+          <Skeleton className="h-8 w-48 mt-6 mx-auto" />
+          <Skeleton className="h-12 w-full mt-4 mx-auto" />
+          <div className="flex justify-center gap-6 mt-6">
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <Skeleton className="h-8 w-8 rounded-md" />
           </div>
-          <div className="flex justify-center gap-4">
-            <Skeleton className="h-10 w-10 rounded-md" />
-            <Skeleton className="h-10 w-10 rounded-md" />
-            <Skeleton className="h-10 w-10 rounded-md" />
-          </div>
-          <div className="space-y-4">
+          <div className="mt-8 space-y-4">
             <Skeleton className="h-24 w-full" />
             <Skeleton className="h-24 w-full" />
           </div>
@@ -35,67 +31,62 @@ export default function PublicProfile() {
     );
   }
 
+  const { profilePictureUrl, name, bio, socialLinks, customLinks } = data;
+
   return (
-    <main className="flex flex-col items-center justify-start min-h-screen bg-background p-4 pt-10 md:pt-16 animate-in fade-in duration-500">
-      <div className="w-full max-w-md mx-auto">
-        {/* Profile Section */}
-        <header className="flex flex-col items-center text-center mb-8">
-          <div className="mb-4 relative w-32 h-32 md:w-36 md:h-36">
+    <div className="min-h-screen bg-background text-foreground font-body antialiased">
+      <main className="max-w-xl mx-auto p-4 sm:p-8">
+        <section className="text-center flex flex-col items-center animate-in fade-in duration-500">
+          <div className="relative w-36 h-36 mb-4">
+            <div className="absolute inset-0 rounded-full bg-blue-500 blur-xl animate-pulse"></div>
+            <div className="absolute inset-1 rounded-full bg-white blur-md"></div>
             <Image
-              src={data.profilePictureUrl}
-              alt={data.name}
-              width={144}
-              height={144}
-              className="rounded-full object-cover border-4 border-card shadow-lg"
-              priority
-              data-ai-hint="portrait person"
+                src={profilePictureUrl}
+                alt={name}
+                width={144}
+                height={144}
+                className="rounded-full object-cover aspect-square relative z-10 border-4 border-background"
+                priority
             />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold font-headline text-foreground">{data.name}</h1>
-          <p className="mt-2 text-base md:text-lg text-muted-foreground max-w-prose">{data.bio}</p>
-        </header>
+          <h1 className="text-3xl font-bold font-headline">{name}</h1>
+          <p className="mt-2 text-center text-muted-foreground max-w-md">{bio}</p>
+        </section>
 
-        {/* Social Links */}
-        {data.socialLinks.length > 0 && (
-          <section className="flex justify-center gap-4 mb-10">
-            {data.socialLinks.map((link) => (
-              <Button asChild variant="ghost" size="icon" key={link.id} className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg h-12 w-12">
-                <Link href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform}>
-                  <SocialIcon platform={link.platform} className="h-6 w-6" />
-                </Link>
-              </Button>
-            ))}
-          </section>
-        )}
-
-        {/* Custom Links */}
-        <section className="space-y-4">
-          {data.customLinks.map((link) => (
-            <Card
-              key={link.id}
-              className="overflow-hidden transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-xl"
-            >
-              <Link href={link.url} target="_blank" rel="noopener noreferrer" className="block">
-                <div className="relative aspect-[16/9] w-full">
-                  <Image
-                    src={link.imageUrl}
-                    alt={link.title}
-                    fill
-                    className="object-cover"
-                    data-ai-hint="abstract tech"
-                  />
-                </div>
-                <div className="p-4 bg-card">
-                  <h3 className="font-semibold text-center text-lg font-headline text-card-foreground">{link.title}</h3>
-                </div>
-              </Link>
-            </Card>
+        <section className="mt-6 flex justify-center gap-6 animate-in fade-in-50 duration-500">
+          {socialLinks.map(link => (
+            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+              <SocialIcon platform={link.platform} className="h-6 w-6" />
+            </a>
           ))}
         </section>
-        <footer className="text-center mt-12 py-4">
-            <Link href="/login" className="text-xs text-muted-foreground hover:text-primary transition-colors">Admin</Link>
-        </footer>
-      </div>
-    </main>
+
+        <section className="mt-8 space-y-4 animate-in fade-in-75 duration-500">
+          {customLinks.map(link => (
+            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="block group">
+              <Card className="overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
+                <CardContent className="p-0 flex items-center">
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={link.imageUrl}
+                      alt={link.title}
+                      width={80}
+                      height={80}
+                      className="object-cover h-20 w-20"
+                    />
+                  </div>
+                  <div className="flex-grow p-4">
+                    <p className="font-semibold text-lg">{link.title}</p>
+                  </div>
+                  <div className="p-4 self-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <ArrowUpRight className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+          ))}
+        </section>
+      </main>
+    </div>
   );
 }
