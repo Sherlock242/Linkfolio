@@ -11,6 +11,7 @@ import { LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import ThemeEditor from "./ThemeEditor";
+import InquiryViewer from "./InquiryViewer";
 
 export default function AdminDashboard() {
   const { data, updateData, isInitialized } = useLinkFolioStore();
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="socials">Social Links</TabsTrigger>
               <TabsTrigger value="links">Custom Links</TabsTrigger>
               <TabsTrigger value="theme">Theme</TabsTrigger>
+              <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
               <ProfileEditor data={data} onUpdate={updateData} />
@@ -60,6 +62,9 @@ export default function AdminDashboard() {
             </TabsContent>
              <TabsContent value="theme">
               <ThemeEditor data={data} onUpdate={updateData} />
+            </TabsContent>
+            <TabsContent value="inquiries">
+              <InquiryViewer />
             </TabsContent>
           </Tabs>
         </div>
