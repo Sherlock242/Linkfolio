@@ -1,3 +1,5 @@
+import PublicProfile from '@/components/public/PublicProfile';
+
 export default function Home() {
-  return <></>;
+  return <PublicProfile />;
 }
