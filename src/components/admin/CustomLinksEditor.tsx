@@ -140,7 +140,7 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
                   <p className="font-medium">{link.title}</p>
                   <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                 </div>
-                <div className="flex items-center">
+                <div className="flex flex-col">
                   <Button variant="ghost" size="icon" onClick={() => handleStartEdit(link)}>
                     <Edit className="h-4 w-4" />
                   </Button>
