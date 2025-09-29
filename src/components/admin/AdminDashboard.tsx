@@ -9,6 +9,7 @@ import SocialLinksEditor from "./SocialLinksEditor";
 import CustomLinksEditor from "./CustomLinksEditor";
 import { LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function AdminDashboard() {
   const { data, updateData, isInitialized } = useLinkFolioStore();
@@ -30,8 +31,10 @@ export default function AdminDashboard() {
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-headline font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+            <Button variant="ghost" onClick={logout} asChild>
+              <Link href="/login">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
+              </Link>
             </Button>
           </div>
         </div>

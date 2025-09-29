@@ -38,11 +38,11 @@ export function useAuth() {
     try {
       sessionStorage.removeItem(AUTH_KEY);
       setIsAuthenticated(false);
-      router.push('/login');
+      // No need to push here, the Link component will handle navigation
     } catch (error) {
       console.error('Could not access session storage:', error);
     }
-  }, [router]);
+  }, []);
 
   return { isAuthenticated, login, logout };
 }
