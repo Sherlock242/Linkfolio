@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +6,7 @@ import type { ProfileData, CustomLink } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trash2, Plus, Edit, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -21,6 +23,26 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
   const [newLink, setNewLink] = useState<Omit<CustomLink, 'id'>>({ title: '', url: '', imageUrl: '' });
   const [editingLink, setEditingLink] = useState<EditableLink | null>(null);
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, forEditing: boolean) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast({ variant: 'destructive', title: "Error", description: "Image size should not exceed 2MB." });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        if (forEditing && editingLink) {
+          setEditingLink({ ...editingLink, imageUrl });
+        } else {
+          setNewLink({ ...newLink, imageUrl });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   const handleAddLink = () => {
     if (!newLink.title || !newLink.url) {
       toast({ variant: 'destructive', title: "Error", description: "Title and URL are required." });
@@ -79,7 +101,11 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
               <div key={link.id} className="p-4 rounded-lg border space-y-4">
                 <Input placeholder="Title" value={editingLink.title} onChange={(e) => handleEditingChange('title', e.target.value)} />
                 <Input placeholder="URL" value={editingLink.url} onChange={(e) => handleEditingChange('url', e.target.value)} />
-                <Input placeholder="Image URL" value={editingLink.imageUrl} onChange={(e) => handleEditingChange('imageUrl', e.target.value)} />
+                <div>
+                  <Label htmlFor="edit-image">Link Image</Label>
+                  <Input id="edit-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} className="mt-1" />
+                  {editingLink.imageUrl && <Image src={editingLink.imageUrl} alt="preview" width={64} height={64} className="mt-2 rounded-md object-cover aspect-square" />}
+                </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={handleSaveEdit}><Save className="h-4 w-4 mr-2"/>Save</Button>
                   <Button size="sm" variant="ghost" onClick={handleCancelEdit}><X className="h-4 w-4 mr-2"/>Cancel</Button>
@@ -110,7 +136,11 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
           <div className="space-y-2">
             <Input placeholder="Link Title" value={newLink.title} onChange={(e) => setNewLink({ ...newLink, title: e.target.value })} />
             <Input placeholder="URL (e.g., https://...)" value={newLink.url} onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} />
-            <Input placeholder="Image URL (optional)" value={newLink.imageUrl} onChange={(e) => setNewLink({ ...newLink, imageUrl: e.target.value })} />
+            <div>
+                <Label htmlFor="new-image">Link Image (Optional)</Label>
+                <Input id="new-image" type="file" accept="image/*" onChange={(e) => handleImageUpload(e, false)} className="mt-1"/>
+                {newLink.imageUrl && <Image src={newLink.imageUrl} alt="preview" width={64} height={64} className="mt-2 rounded-md object-cover aspect-square" />}
+            </div>
           </div>
           <Button onClick={handleAddLink}>
             <Plus className="h-4 w-4 mr-2" /> Add Link
@@ -120,3 +150,4 @@ export default function CustomLinksEditor({ data, onUpdate }: CustomLinksEditorP
     </Card>
   );
 }
+
