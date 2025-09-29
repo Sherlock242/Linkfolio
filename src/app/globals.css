@@ -8,25 +8,35 @@ body {
 
 @layer base {
   :root {
-    --background: 228 67% 97%;
+    --background-h: 228;
+    --background-s: 67%;
+    --background-l: 97%;
+    --primary-h: 231;
+    --primary-s: 48%;
+    --primary-l: 48%;
+    --accent-h: 187;
+    --accent-s: 100%;
+    --accent-l: 42%;
+    
+    --background: var(--background-h) var(--background-s) var(--background-l);
     --foreground: 220 9% 10%;
     --card: 228 60% 99%;
     --card-foreground: 220 9% 10%;
     --popover: 228 60% 99%;
     --popover-foreground: 220 9% 10%;
-    --primary: 231 48% 48%;
+    --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 98%;
     --secondary: 228 30% 92%;
     --secondary-foreground: 231 48% 48%;
     --muted: 228 30% 92%;
     --muted-foreground: 228 10% 45%;
-    --accent: 187 100% 42%;
+    --accent: var(--accent-h) var(--accent-s) var(--accent-l);
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 228 30% 88%;
     --input: 228 30% 88%;
-    --ring: 231 48% 48%;
+    --ring: var(--primary-h) var(--primary-s) var(--primary-l);
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -44,19 +54,19 @@ body {
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 2%;
     --popover-foreground: 0 0% 98%;
-    --primary: 231 48% 48%;
+    --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 10%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 187 100% 42%;
+    --accent: var(--accent-h) var(--accent-s) var(--accent-l);
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 12%;
     --input: 0 0% 12%;
-    --ring: 231 48% 48%;
+    --ring: var(--primary-h) var(--primary-s) var(--primary-l);
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -87,9 +97,9 @@ body {
     @apply absolute inset-0 rounded-full;
     background: conic-gradient(
       from var(--angle),
-      #007cf0,
-      #00dfd8,
-      #007cf0
+      hsl(var(--primary)),
+      hsl(var(--accent)),
+      hsl(var(--primary))
     );
     filter: blur(16px);
     animation: hitech-spin 4s linear infinite;

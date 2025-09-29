@@ -10,6 +10,7 @@ import CustomLinksEditor from "./CustomLinksEditor";
 import { LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import ThemeEditor from "./ThemeEditor";
 
 export default function AdminDashboard() {
   const { data, updateData, isInitialized } = useLinkFolioStore();
@@ -42,10 +43,11 @@ export default function AdminDashboard() {
       <main className="p-4 md:p-8">
         <div className="max-w-5xl mx-auto">
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="socials">Social Links</TabsTrigger>
               <TabsTrigger value="links">Custom Links</TabsTrigger>
+              <TabsTrigger value="theme">Theme</TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
               <ProfileEditor data={data} onUpdate={updateData} />
@@ -55,6 +57,9 @@ export default function AdminDashboard() {
             </TabsContent>
             <TabsContent value="links">
               <CustomLinksEditor data={data} onUpdate={updateData} />
+            </TabsContent>
+             <TabsContent value="theme">
+              <ThemeEditor data={data} onUpdate={updateData} />
             </TabsContent>
           </Tabs>
         </div>

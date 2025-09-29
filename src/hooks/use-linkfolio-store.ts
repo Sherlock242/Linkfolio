@@ -22,6 +22,12 @@ const initialData: ProfileData = {
     { id: '1', title: 'My Portfolio', url: '#', imageUrl: 'https://picsum.photos/seed/1/500/300' },
     { id: '2', title: 'Latest Blog Post', url: '#', imageUrl: 'https://picsum.photos/seed/2/500/300' },
   ],
+  theme: {
+    background: { h: 228, s: 67, l: 97 },
+    primary: { h: 231, s: 48, l: 48 },
+    accent: { h: 187, s: 100, l: 42 },
+    font: 'inter',
+  }
 };
 
 
