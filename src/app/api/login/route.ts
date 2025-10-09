@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     // TEMPORARY: Direct password comparison.
     // This is insecure and should be replaced with a proper hashing mechanism.
-    if (password === '2805prerna') {
+    if (password === 'santosh242@') {
        return NextResponse.json({ success: true });
     }
 
