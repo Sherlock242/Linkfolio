@@ -7,15 +7,6 @@ export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    // --- TEMPORARY CODE TO GENERATE HASH ---
-    // This will generate a hash for the password you enter and log it.
-    // Copy the hash from your server logs and update it in your Supabase 'admin_credentials' table.
-    // After you've updated the database, I will remove this code.
-    const tempHash = await bcrypt.hash(password, 10);
-    console.log(`Your secure password hash is: ${tempHash}`);
-    // --- END TEMPORARY CODE ---
-
-
     const { data: adminUser, error: dbError } = await supabase
       .from('admin_credentials')
       .select('hashed_password')
