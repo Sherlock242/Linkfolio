@@ -6,16 +6,9 @@ export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    // TEMPORARY: Direct password comparison.
-    // This is insecure and should be replaced with a proper hashing mechanism.
-    if (password === 'santosh242@') {
-       return NextResponse.json({ success: true });
-    }
-
-    // The code below is currently bypassed but will be used once hashing is re-enabled.
     const { data: adminUser, error: dbError } = await supabase
       .from('admin_credentials')
-      .select('hashed_password')
+      .select('password')
       .eq('username', 'admin')
       .single();
 
@@ -23,12 +16,8 @@ export async function POST(request: Request) {
         console.error("Database error or admin user not found:", dbError?.message);
         return NextResponse.json({ success: false, error: 'Authentication failed.' }, { status: 401 });
     }
-    
-    // This will be re-enabled later.
-    // const isPasswordCorrect = await bcrypt.compare(password, adminUser.hashed_password);
-    const isPasswordCorrect = false; // Hardcoded to false for now
 
-    if (isPasswordCorrect) {
+    if (password === adminUser.password) {
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 });
