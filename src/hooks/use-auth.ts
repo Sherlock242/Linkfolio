@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -19,19 +20,35 @@ export function useAuth() {
     }
   }, []);
 
-  const login = useCallback((password: string) => {
-    if (password === '2805prerna') {
-      try {
-        sessionStorage.setItem(AUTH_KEY, 'true');
-        setIsAuthenticated(true);
-        router.push('/admin');
-        return true;
-      } catch (error) {
-        console.error('Could not access session storage:', error);
+  const login = useCallback(async (password: string) => {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        try {
+          sessionStorage.setItem(AUTH_KEY, 'true');
+          setIsAuthenticated(true);
+          router.push('/admin');
+          return true;
+        } catch (error) {
+          console.error('Could not access session storage:', error);
+          return false;
+        }
+      } else {
         return false;
       }
+    } catch (error) {
+      console.error('Login request failed:', error);
+      return false;
     }
-    return false;
   }, [router]);
 
   const logout = useCallback(() => {

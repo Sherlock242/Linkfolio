@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,19 +12,26 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    const success = login(password);
+    setIsLoading(true);
+
+    const success = await login(password);
+
+    setIsLoading(false);
+
     if (!success) {
-      setError("Incorrect password. Please try again.");
+      const desc = "Incorrect password. Please try again.";
+      setError(desc);
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Incorrect password. Please try again.",
+        description: desc,
       });
     }
   };
@@ -50,8 +58,8 @@ export default function LoginForm() {
         </button>
       </div>
       {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-      <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-        Access Dashboard
+      <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+        {isLoading ? 'Verifying...' : 'Access Dashboard'}
       </Button>
     </form>
   );
