@@ -1,19 +1,18 @@
 
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    // --- TEMPORARY CODE TO GENERATE HASH ---
-    // This will securely hash the password you provide.
-    const tempHash = await bcrypt.hash(password, 10);
-    console.log(`Your secure password hash is: ${tempHash}`);
-    // --- END OF TEMPORARY CODE ---
+    // TEMPORARY: Direct password comparison.
+    // This is insecure and should be replaced with a proper hashing mechanism.
+    if (password === '2805prerna') {
+       return NextResponse.json({ success: true });
+    }
 
-
+    // The code below is currently bypassed but will be used once hashing is re-enabled.
     const { data: adminUser, error: dbError } = await supabase
       .from('admin_credentials')
       .select('hashed_password')
@@ -25,7 +24,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Authentication failed.' }, { status: 401 });
     }
     
-    const isPasswordCorrect = await bcrypt.compare(password, adminUser.hashed_password);
+    // This will be re-enabled later.
+    // const isPasswordCorrect = await bcrypt.compare(password, adminUser.hashed_password);
+    const isPasswordCorrect = false; // Hardcoded to false for now
 
     if (isPasswordCorrect) {
       return NextResponse.json({ success: true });
