@@ -1,7 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: 'LinkFolio',
@@ -20,7 +19,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         
-        <Script type='text/javascript' src='//certainwolveshonestly.com/b8/17/3b/b8173b354c2214ec5a0c4a1b64c0e6b8.js' strategy="lazyOnload" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         {children}
