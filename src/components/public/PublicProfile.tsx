@@ -135,7 +135,7 @@ export default function PublicProfile() {
           </p>
         </div>
 
-        <div className="mt-8 flex justify-center gap-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300">
+        <div className="mt-8 flex flex-wrap justify-center gap-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300">
           {socialLinks.map((link) => (
             <a
               key={link.id}
